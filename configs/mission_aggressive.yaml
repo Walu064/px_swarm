@@ -1,0 +1,75 @@
+name: aggressive_turns
+description: >
+  Dynamic swarm mission with multiple direction changes. Drones start from one
+  area, execute sharper turns at constant altitude, then finish and land at the
+  final waypoint.
+
+version: 1
+coordinate_frame: NED
+
+takeoff:
+  altitude_m: 10.0
+  settle_time_s: 2.0
+
+landing:
+  mode: at_last_waypoint
+  descend_rate_m_s: 1.0
+
+default_speed_m_s: 3.5
+
+waypoints:
+  - id: start
+    north_m: 0.0
+    east_m: 0.0
+    down_m: -10.0
+    speed_m_s: 2.0
+    hold_s: 1.5
+
+  - id: turn_1
+    north_m: 20.0
+    east_m: 18.0
+    down_m: -10.0
+    speed_m_s: 3.5
+    hold_s: 0.3
+
+  - id: turn_2
+    north_m: 45.0
+    east_m: -12.0
+    down_m: -10.0
+    speed_m_s: 4.0
+    hold_s: 0.3
+
+  - id: turn_3
+    north_m: 70.0
+    east_m: 16.0
+    down_m: -10.0
+    speed_m_s: 4.2
+    hold_s: 0.2
+
+  - id: turn_4
+    north_m: 92.0
+    east_m: -8.0
+    down_m: -10.0
+    speed_m_s: 4.0
+    hold_s: 0.2
+
+  - id: turn_5
+    north_m: 115.0
+    east_m: 22.0
+    down_m: -10.0
+    speed_m_s: 3.8
+    hold_s: 0.2
+
+  - id: turn_6
+    north_m: 138.0
+    east_m: -15.0
+    down_m: -10.0
+    speed_m_s: 4.0
+    hold_s: 0.2
+
+  - id: final
+    north_m: 165.0
+    east_m: 0.0
+    down_m: -10.0
+    speed_m_s: 2.5
+    hold_s: 3.0

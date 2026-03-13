@@ -1,0 +1,32 @@
+name: simple_a_to_b
+description: >
+  Basic swarm transit. All drones take off near point A, follow the leader
+  along a mostly straight route, then land near point B.
+
+version: 1
+coordinate_frame: NED
+
+takeoff:
+  altitude_m: 10.0
+  settle_time_s: 2.0
+
+landing:
+  mode: at_last_waypoint
+  descend_rate_m_s: 0.8
+
+default_speed_m_s: 2.5
+
+waypoints:
+  - id: A_start
+    north_m: 0.0
+    east_m: 0.0
+    down_m: -10.0
+    speed_m_s: 1.5
+    hold_s: 1.0
+
+  - id: B_goal
+    north_m: 100.0
+    east_m: 0.0
+    down_m: -10.0
+    speed_m_s: 2.0
+    hold_s: 3.0
