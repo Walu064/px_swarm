@@ -1,14 +1,18 @@
 # PX-Swarm
 
-Distributed Swarm Control for PX4 SITL (C++ / MAVSDK / Isaac Sim / Pegasus)
+Distributed Swarm Control for PX4 SITL (C++ / MAVSDK / simulator backend)
 
-## Overview
+## English
 
-PX-Swarm is a distributed swarm control framework for multirotor UAVs simulated in:
+### Overview
 
-- Isaac Sim 5.x
-- Pegasus Simulator extension
-- PX4 SITL
+PX-Swarm is a distributed swarm control framework for multirotor UAVs running on top of PX4 SITL and a compatible simulator stack.
+
+The simulator backend is not fixed. It can be, for example:
+
+- Isaac Sim with Pegasus
+- Gazebo
+- another simulator integrated with PX4 SITL
 
 The control layer is implemented in C++ using MAVSDK.
 
@@ -19,11 +23,11 @@ The core runtime model is simple:
 - multiple nodes running in parallel form a swarm,
 - swarm members exchange state through a lightweight peer-to-peer UDP channel.
 
-For a full bilingual architecture walkthrough with runtime diagrams, see [docs/PX_SWARM_SYSTEM_SCHEMATICS.md](docs/PX_SWARM_SYSTEM_SCHEMATICS.md).
+For a full architecture walkthrough with runtime diagrams, see [documentation](docs/PX_SWARM_SYSTEM_SCHEMATICS.md). Both files can be viewed side by side.
 
 This means the swarm is distributed by design. There is no single central process responsible for commanding every vehicle. Each node makes its own decisions based on local state, PX4 telemetry, and messages received from the rest of the swarm.
 
-## Roles
+### Roles
 
 Each `px_swarm_node` runs in one of two roles.
 
@@ -57,20 +61,22 @@ The current follower controller uses a simple control loop:
 - keep that target as the local navigation objective,
 - command velocity toward that target using a proportional controller.
 
-## System Architecture
+### System Architecture
 
 At runtime, the setup looks like this:
 
 ```text
-+-------------------------------------------------------------+
-|                     Isaac Sim + Pegasus                     |
-|                                                             |
-|   PX4 SITL #0  <--udp:14540-->  px_swarm_node (leader)      |
-|   PX4 SITL #1  <--udp:14541-->  px_swarm_node (follower)    |
-|   PX4 SITL #2  <--udp:14542-->  px_swarm_node (follower)    |
-|   ...                                                       |
-|                                                             |
-+-------------------------------------------------------------+
++------------------------------------------------------------------+
+|                    Simulator Backend + PX4 SITL                  |
+|                                                                  |
+|   Example backends: Isaac Sim + Pegasus, Gazebo, others          |
+|                                                                  |
+|   PX4 SITL #0  <--udp:14540-->  px_swarm_node (leader)           |
+|   PX4 SITL #1  <--udp:14541-->  px_swarm_node (follower)         |
+|   PX4 SITL #2  <--udp:14542-->  px_swarm_node (follower)         |
+|   ...                                                            |
+|                                                                  |
++------------------------------------------------------------------+
 ```
 
 Each PX4 instance is independent. Each `px_swarm_node` binds to one MAVSDK UDP endpoint and controls only its assigned vehicle.
@@ -82,7 +88,7 @@ Separately, all nodes communicate over a shared swarm bus:
 
 This second channel is used only for swarm coordination, not for PX4 control.
 
-## Communication Layers
+### Communication Layers
 
 There are two distinct communication layers in the system.
 
@@ -140,7 +146,7 @@ Each node continuously:
 4. updates a local `SwarmState`,
 5. executes role-specific control logic.
 
-## Runtime Flow
+### Runtime Flow
 
 The executable `px_swarm_node` performs the following sequence:
 
@@ -167,7 +173,7 @@ On shutdown, the node:
 - lands,
 - attempts to disarm cleanly.
 
-## Control Logic
+### Control Logic
 
 ### Leader Control
 
@@ -205,7 +211,7 @@ Target tracking:
 
 This architecture keeps the optimization logic separate from the low-level flight command logic.
 
-## Project Structure
+### Project Structure
 
 ```text
 include/
@@ -240,14 +246,43 @@ Main components:
 - `src/swarm/pso.cpp`: PSO optimizer
 - `src/utils/keyboard.cpp`: terminal keyboard input
 
+## Polski
+
+### Opis
+
+PX-Swarm to rozproszony framework sterowania rojem wielowirnikowców działający nad PX4 SITL i zgodnym backendem symulacyjnym.
+
+Backend symulacji nie jest narzucony. Może to być na przykład:
+
+- Isaac Sim z Pegasus
+- Gazebo
+- inny symulator zintegrowany z PX4 SITL
+
+Warstwa sterowania jest zaimplementowana w C++ z użyciem MAVSDK.
+
+Model działania jest prosty:
+
+- jeden proces `px_swarm_node` steruje dokładnie jednym UAV,
+- każdy node łączy się z jedną instancją PX4 SITL przez UDP,
+- wiele node'ów uruchomionych równolegle tworzy rój,
+- członkowie roju wymieniają stan przez lekki kanał UDP peer-to-peer.
+
+Pełny opis architektury z diagramami znajduje się w [dokumentacji](docs/PX_SWARM_SYSTEM_SCHEMATICS.md). Oba pliki można wygodnie otworzyć obok siebie.
+
+To oznacza, że rój jest rozproszony z założenia. Nie ma jednego centralnego procesu sterującego wszystkimi pojazdami. Każdy node podejmuje decyzje na podstawie własnego stanu, telemetrii PX4 i wiadomości odebranych od reszty roju.
+
 ## Requirements
 
 ### Simulation stack
 
 - Ubuntu
-- NVIDIA Isaac Sim 5.x
-- Pegasus Simulator extension
 - PX4-Autopilot built for SITL
+- any simulator backend compatible with PX4 SITL and MAVLink UDP
+
+Examples:
+
+- Isaac Sim with Pegasus
+- Gazebo
 
 Expected PX4 binary path:
 
@@ -370,7 +405,7 @@ This repository focuses on the swarm control node, not on fully automating the s
 PX-Swarm provides a practical distributed architecture for testing cooperative multirotor swarm behavior in simulation:
 
 - PX4 SITL handles flight dynamics and autopilot behavior,
-- Isaac Sim + Pegasus provide the simulation environment,
+- the simulation environment can be provided by Isaac Sim + Pegasus, Gazebo, or another PX4-compatible backend,
 - each `px_swarm_node` controls one UAV,
 - the leader is operator-driven,
 - followers use PSO-based target selection,
